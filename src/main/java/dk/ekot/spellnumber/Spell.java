@@ -14,17 +14,39 @@
  */
 package dk.ekot.spellnumber;
 
-import dk.statsbiblioteket.util.qa.QAInfo;
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
+import com.ibm.icu.text.NumberFormat;
+import com.ibm.icu.text.RuleBasedNumberFormat;
+import com.ibm.icu.util.ULocale;
 
-/**
- *
- */
-@QAInfo(level = QAInfo.Level.NORMAL,
-        state = QAInfo.State.IN_DEVELOPMENT,
-        author = "te")
+
 public class Spell {
-    private static Log log = LogFactory.getLog(Spell.class);
+    private final ULocale locale;
+    private final NumberFormat formatter;
+
+    public Spell(String locale) {
+        this.locale = new ULocale(locale);
+        this.formatter = new RuleBasedNumberFormat(this.locale, RuleBasedNumberFormat.SPELLOUT);
+    }
+
+    public static void main(String[] args) {
+        if (args == null || args.length != 2) {
+            usage();
+            return;
+        }
+        System.out.println(args[0] + " " + spell(args[0], Double.parseDouble(args[1])));
+    }
+
+    public static String spell(String localeStr, double number) {
+        return new Spell(localeStr).format(number);
+    }
+
+    private static void usage() {
+        System.out.println("Usage:   Spell <locale> <number>");
+        System.out.println("Example: Spell da 87");
+    }
+
+    public String format(double number) {
+        return formatter.format(number);
+    }
 
 }
